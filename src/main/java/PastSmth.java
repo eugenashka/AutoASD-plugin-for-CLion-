@@ -505,7 +505,7 @@ public class PastSmth extends AnAction {
                         return l.a < r.a;
                     return l.a * r.b < l.b * r.a;
                 }
-                
+                /s
                 bool cmp(point a, point b) {
                     if (a.x == b.x)
                         return a.y < b.y;
