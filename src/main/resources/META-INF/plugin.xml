@@ -13,14 +13,11 @@
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
-    <description>
+    <description><![CDATA[
     This plugin gives you an ability to past in your C++ code many algorithms and structures.
-
+        Algorithms and structures by Robshak, plugin by Eugenashka.
     You can watch the source code on GitHub: https://github.com/eugenashka/AutoASD-plugin-for-CLion-
-
-    Algorithms and structures by Robshak, plugin by Eugenashka.
-
-  </description>
+  ]]></description>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
