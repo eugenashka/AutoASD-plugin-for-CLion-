@@ -19,196 +19,197 @@ public class PastSmth extends AnAction {
     private static @NotNull Map<String, String> getOptions() {
         Map<String, String> options = new HashMap<>();
         options.put("One-ordered list", """
-                struct Node{
-                    int value;
-                    Node* next;
-                };
-                \s
-                struct one_ordered_list{
-                    Node* first;
-                    Node* last;
-                    \s
-                    list : first(nullptr), last(nullptr) {}
-                    \s
-                    bool empty() {
-                        return first == nullptr;
-                    }
-                    \s
-                    void push_back(int _val) {
-                        Node* p = new Node(_val);
-                        if (empty()) {
-                            first = p;
-                            last = p;
-                            return;
-                        }
-                        last->next = p;
-                        last = p;
-                    }
-                    \s
-                    void print() {
-                        if (empty()) return;
-                        Node* p = first;
-                        while (p) {
-                            cout << p->val << " ";
-                            p = p->next;
-                        }
-                        cout << endl;
-                    }
+                struct Node {
+                      int value;
+                      Node *next;
+                  };
                 
-                    Node* find(int _val) {
-                        Node* p = first;
-                        while (p && p->val != _val) p = p->next;
-                        return (p && p->val == _val) ? p : nullptr;
-                    }
-                    \s
-                    void pop_front() {
-                        if (empty()) return;
-                        Node* p = first;
-                        first = p->next;
-                        delete p;
-                    }
-                    \s
-                    void pop_back() {
-                        if (empty()) return;
-                        if (first == last) {
-                            remove_first();
-                            return;
-                        }
-                        Node* p = first;
-                        while (p->next != last) p = p->next;
-                        p->next = nullptr;
-                        delete last;
-                        last = p;
-                    }
-                    \s
-                    void pop_key(int _val) {
-                        if (empty()) return;
-                        if (first->val == _val) {
-                            remove_first();
-                            return;
-                        } else if (last->val == _val) {
-                            remove_last();
-                            return;
-                        }
-                        Node* slow = first;
-                        Node* fast = first->next;
-                        while (fast && fast->val != _val) {
-                            fast = fast->next;
-                            slow = slow->next;
-                        }
-                        if (!fast) {
-                            cout << "This element does not exist" << endl;
-                            return;
-                        }
-                        slow->next = fast->next;
-                        delete fast;
-                    }
-                    \s
-                    Node* operator[] (const int ind) {
-                        if (empty()) return nullptr;
-                        Node* p = first;
-                        for (int i = 0; i < ind; i++) {
-                            p = p->next;
-                            if (!p) return nullptr;
-                        }
-                        return p;
-                    }
-                };"""
+                  struct one_ordered_list {
+                      Node *first;
+                      Node *last;
+                
+                      one_ordered_list() : first(nullptr), last(nullptr) {}
+                
+                      bool empty() {
+                          return first == nullptr;
+                      }
+                
+                      void push_back(int _val) {
+                          Node *p = new Node(_val);
+                          if (empty()) {
+                              first = p;
+                              last = p;
+                              return;
+                          }
+                          last->next = p;
+                          last = p;
+                      }
+                
+                      void print() {
+                          if (empty()) return;
+                          Node *p = first;
+                          while (p) {
+                              cout << p->value << " ";
+                              p = p->next;
+                          }
+                          cout << endl;
+                      }
+                
+                      Node *find(int _val) {
+                          Node *p = first;
+                          while (p && p->value != _val) p = p->next;
+                          return (p && p->value == _val) ? p : nullptr;
+                      }
+                
+                      void pop_front() {
+                          if (empty()) return;
+                          Node *p = first;
+                          first = p->next;
+                          delete p;
+                      }
+                
+                      void pop_back() {
+                          if (empty()) return;
+                          if (first == last) {
+                              pop_front();
+                              return;
+                          }
+                          Node *p = first;
+                          while (p->next != last) p = p->next;
+                          p->next = nullptr;
+                          delete last;
+                          last = p;
+                      }
+                
+                      void pop_key(int _val) {
+                          if (empty()) return;
+                          if (first->value == _val) {
+                              pop_front();
+                              return;
+                          } else if (last->value == _val) {
+                              pop_back();
+                              return;
+                          }
+                          Node *slow = first;
+                          Node *fast = first->next;
+                          while (fast && fast->value != _val) {
+                              fast = fast->next;
+                              slow = slow->next;
+                          }
+                          if (!fast) {
+                              cout << "This element does not exist" << endl;
+                              return;
+                          }
+                          slow->next = fast->next;
+                          delete fast;
+                      }
+                
+                      Node *operator[](const int ind) {
+                          if (empty()) return nullptr;
+                          Node *p = first;
+                          for (int i = 0; i < ind; i++) {
+                              p = p->next;
+                              if (!p) return nullptr;
+                          }
+                          return p;
+                      }
+                  };
+                """
         );
         options.put("Two-ordered list", """
-                struct Node{
-                    int value;
-                    struct Node* next;
-                    struct Node* prev;
-                };
+                struct Node {
+                      int value;
+                      struct Node *next;
+                      struct Node *prev;
+                  };
                 
-                struct two_ordered_list {
-                    Node* first;
-                    Node* last;
+                  struct two_ordered_list {
+                      Node *first;
+                      Node *last;
                 
-                    tolist() : first(nullptr), last(nullptr) {}
+                      two_ordered_list() : first(nullptr), last(nullptr) {}
                 
-                    bool empty() {
-                        return first == nullptr;
-                    }
+                      bool empty() {
+                          return first == nullptr;
+                      }
                 
-                    void push_back(int val) {
-                        Node* now = new Node;
-                        now->value = val;
-                        now->next = nullptr;
-                        now->prev = last;
-                        if (last != nullptr) {
-                            last->next = now;
-                        }
-                        last = now;
-                        if (empty()) {
-                            first = last;
-                        }
-                    }
-                    \s
-                    void push_front(int val) {
-                        Node* now = new Node;
-                        now->value = val;
-                        now->next = first;
-                        now->prev = nullptr;
-                        if (first != nullptr) {
-                            first->prev = now;
-                        }
-                        first = now;
-                        if (first->next == nullptr) {
-                            last = first;
-                        }
-                    }
-                    \s
-                    int getlast() {
-                        return last->value;
-                    }
-                    \s
-                    int getfirst() {
-                        return first->value;
-                    }
-                    \s
-                    void pop_back() {
-                        if (empty()) return;
-                        Node* now = last;
-                        last = last->prev;
-                        if (last != nullptr) {
-                            last->next = nullptr;
-                        } else {
-                            first = nullptr;
-                        }
-                        delete now;
-                    }
-                    \s
-                    void pop_front() {
-                        if (empty()) return;
-                        Node* now = first;
-                        first = first->next;
-                        if (first != nullptr) {
-                            first->prev = nullptr;
-                        } else {
-                            first = nullptr;
-                        }
-                    }
-                    \s
-                    Node* operator[] (int pos) {
-                        Node *now = first;
-                        for (int i = 0; i < pos; i++) {
-                            now = now->next;
-                        }
-                        return now->value;
-                    }
-                    \s
-                    void print() {
-                        if (is_empty()) return;
-                        Node* p = first;
-                        while (p) {
-                            cout << p->val << " ";
-                            p = p->next;
-                        }
-                        cout << endl;
-                    }
-                };
+                      void push_back(int val) {
+                          Node *now = new Node;
+                          now->value = val;
+                          now->next = nullptr;
+                          now->prev = last;
+                          if (last != nullptr) {
+                              last->next = now;
+                          }
+                          last = now;
+                          if (empty()) {
+                              first = last;
+                          }
+                      }
+                
+                      void push_front(int val) {
+                          Node *now = new Node;
+                          now->value = val;
+                          now->next = first;
+                          now->prev = nullptr;
+                          if (first != nullptr) {
+                              first->prev = now;
+                          }
+                          first = now;
+                          if (first->next == nullptr) {
+                              last = first;
+                          }
+                      }
+                
+                      int getlast() {
+                          return last->value;
+                      }
+                
+                      int getfirst() {
+                          return first->value;
+                      }
+                
+                      void pop_back() {
+                          if (empty()) return;
+                          Node *now = last;
+                          last = last->prev;
+                          if (last != nullptr) {
+                              last->next = nullptr;
+                          } else {
+                              first = nullptr;
+                          }
+                          delete now;
+                      }
+                
+                      void pop_front() {
+                          if (empty()) return;
+                          Node *now = first;
+                          first = first->next;
+                          if (first != nullptr) {
+                              first->prev = nullptr;
+                          } else {
+                              first = nullptr;
+                          }
+                      }
+                
+                      Node *operator[](int pos) {
+                          Node *now = first;
+                          for (int i = 0; i < pos; i++) {
+                              now = now->next;
+                          }
+                          return now;
+                      }
+                
+                      void print() {
+                          if (empty()) return;
+                          Node *p = first;
+                          while (p) {
+                              cout << p->value << " ";
+                              p = p->next;
+                          }
+                          cout << endl;
+                      }
+                  };
                 """);
         options.put("Geometry functions", """
                 const long double EPS = 0.000000001;
@@ -505,7 +506,7 @@ public class PastSmth extends AnAction {
                         return l.a < r.a;
                     return l.a * r.b < l.b * r.a;
                 }
-                /s
+                
                 bool cmp(point a, point b) {
                     if (a.x == b.x)
                         return a.y < b.y;
@@ -626,7 +627,7 @@ public class PastSmth extends AnAction {
                     void buildHull() {
                         vector<point> tmp = pts;
                         sort(tmp.begin(), tmp.end(), cmp);
-                        /s
+                        \s
                         point start = tmp[0];
                         point finish = tmp.back();
                 
@@ -654,7 +655,7 @@ public class PastSmth extends AnAction {
                         for (int i = down.size() - 2; i >= 1; i--) {
                             hull.push_back(down[i]);
                         }
-               
+                
                         szHull = (int)hull.size();
                     }
                 };
@@ -793,69 +794,69 @@ public class PastSmth extends AnAction {
                 """);
         options.put("Segment tree with scanline", """
                 struct Node {
-                    int val, step;
-                };
+                     int val, step;
+                 };
                 
-                vector<Node> tree;
-                vector<int> push;
-                vector<int> a;
+                 vector<Node> tree;
+                 vector<int> push;
+                 vector<int> vec;
                 
-                struct Event {
-                    int x, y1, y2, type;
-                };
+                 struct Event {
+                     int x, y1, y2, type;
+                 };
                 
-                bool cmp(Event a, Event b) {
-                    return a.x < b.x;
-                }
+                 bool cmp(Event a, Event b) {
+                     return a.x < b.x;
+                 }
                 
-                Node merge(Node a, Node b) {
-                    if (a.val == b.val)
-                        return { a.val, a.step + b.step };
-                    if (a.val < b.val)
-                        return a;
-                    else
-                        return b;
-                }
+                 Node merge(Node a, Node b) {
+                     if (a.val == b.val)
+                         return { a.val, a.step + b.step };
+                     if (a.val < b.val)
+                         return a;
+                     else
+                         return b;
+                 }
                 
-                void makePush(int v) {
-                    if (push[v] == 0)
-                        return;
+                 void makePush(int v) {
+                     if (push[v] == 0)
+                         return;
                 
-                    push[2 * v + 1] += push[v];
-                    push[2 * v + 2] += push[v];
+                     push[2 * v + 1] += push[v];
+                     push[2 * v + 2] += push[v];
                 
-                    tree[2 * v + 1].val += push[v];
-                    tree[2 * v + 2].val += push[v];
+                     tree[2 * v + 1].val += push[v];
+                     tree[2 * v + 2].val += push[v];
                 
-                    push[v] = 0;
-                }
+                     push[v] = 0;
+                 }
                 
-                void build(int v, int l, int r) {
-                    if (l == r - 1) {
-                        tree[v] = { 0, a[l] };
-                        return;
-                    }
-                    int mid = (l + r) / 2;
-                    build(2 * v + 1, l, mid);
-                    build(2 * v + 2, mid, r);
-                    tree[v] = merge(tree[2 * v + 1], tree[2 * v + 2]);
-                }
+                 void build(int v, int l, int r) {
+                     if (l == r - 1) {
+                         tree[v] = {0, vec[l] };
+                         return;
+                     }
+                     int mid = (l + r) / 2;
+                     build(2 * v + 1, l, mid);
+                     build(2 * v + 2, mid, r);
+                     tree[v] = merge(tree[2 * v + 1], tree[2 * v + 2]);
+                 }
                 
-                void upd(int v, int l, int r, int ql, int qr, int x) {
-                    if (qr <= l || ql >= r)
-                        return;
-                    if (ql <= l && qr >= r) {
-                        tree[v].val += x;
-                        push[v] += x;
-                        return;
-                    }
+                 void upd(int v, int l, int r, int ql, int qr, int x) {
+                     if (qr <= l || ql >= r)
+                         return;
+                     if (ql <= l && qr >= r) {
+                         tree[v].val += x;
+                         push[v] += x;
+                         return;
+                     }
                 
-                    makePush(v);
-                    int mid = (l + r) / 2;
-                    upd(2 * v + 1, l, mid, ql, qr, x);
-                    upd(2 * v + 2, mid, r, ql, qr, x);
-                    tree[v] = merge(tree[2 * v + 1], tree[2 * v + 2]);
-                }
+                     makePush(v);
+                     int mid = (l + r) / 2;
+                     upd(2 * v + 1, l, mid, ql, qr, x);
+                     upd(2 * v + 2, mid, r, ql, qr, x);
+                     tree[v] = merge(tree[2 * v + 1], tree[2 * v + 2]);
+                 }
                 """);
         options.put("Z/pref-functions", """
                 vector<int> ZFunction(string& s) {
