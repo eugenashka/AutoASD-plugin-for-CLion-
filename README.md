@@ -4,3 +4,5 @@
 **Algorithms and structures by Robshak**
 
 This plugin gives you ability to paste in your code some structures and algorithms. Just use ```Alt+A + Alt+F``` combination, choose what you need and ```Enter```!
+
+[Link to JetBrains plugins market](https://plugins.jetbrains.com/plugin/25758-autoasd/)
