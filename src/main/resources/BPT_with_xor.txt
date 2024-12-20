@@ -1,0 +1,58 @@
+struct Node {
+    int go[2];
+    int cnt;
+    int tree_cnt;
+
+    Node() {
+        go[0] = go[1] = -1;
+        cnt = 0;
+        tree_cnt = 0;
+    }
+};
+
+vector<Node> trie;
+
+void add_val(int x) {
+    int v = 0;
+    for (int i = 31; i >= 0; i--) {
+        bool flag = (x & (1 << i));
+        if (trie[v].go[flag] == -1) {
+            trie.emplace_back();
+            trie[v].go[flag] = trie.size() - 1;
+        }
+        trie[v].tree_cnt++;
+        v = trie[v].go[flag];
+    }
+    trie[v].tree_cnt++;
+    trie[v].cnt++;
+}
+
+void del_val(int x) {
+    int v = 0;
+    for (int i = 31; i >= 0; i--) {
+        bool flag = (x & (1 << i));
+        trie[v].tree_cnt--;
+        v = trie[v].go[flag];
+    }
+    trie[v].tree_cnt--;
+    trie[v].cnt--;
+}
+
+// In this case, for a given x, it finds such a y that (x XOR y) will be maximized.
+int get_ans(int x) {
+    int v = 0;
+    int res = 0;
+    for (int i = 31; i >= 0; i--) {
+        bool flag = (x & (1 << i));
+        if (trie[v].go[!flag] != -1 && trie[trie[v].go[!flag]].tree_cnt > 0) {
+            v = trie[v].go[!flag];
+            res += (1 << i);
+        } else {
+            if (trie[v].go[flag] != -1)
+                v = trie[v].go[flag];
+            else
+                break;
+        }
+    }
+    return res;
+}

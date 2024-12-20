@@ -1,0 +1,93 @@
+struct Node {
+    int value;
+    struct Node *next;
+    struct Node *prev;
+};
+
+struct two_ordered_list {
+    Node *first;
+    Node *last;
+
+    two_ordered_list() : first(nullptr), last(nullptr) {}
+
+    bool empty() {
+        return first == nullptr;
+    }
+
+    void push_back(int val) {
+        Node *now = new Node;
+        now->value = val;
+        now->next = nullptr;
+        now->prev = last;
+        if (last != nullptr) {
+            last->next = now;
+        }
+        last = now;
+        if (empty()) {
+            first = last;
+        }
+    }
+
+    void push_front(int val) {
+        Node *now = new Node;
+        now->value = val;
+        now->next = first;
+        now->prev = nullptr;
+        if (first != nullptr) {
+            first->prev = now;
+        }
+        first = now;
+        if (first->next == nullptr) {
+            last = first;
+        }
+    }
+
+    int getlast() {
+        return last->value;
+    }
+
+    int getfirst() {
+        return first->value;
+    }
+
+    void pop_back() {
+        if (empty()) return;
+        Node *now = last;
+        last = last->prev;
+        if (last != nullptr) {
+            last->next = nullptr;
+        } else {
+            first = nullptr;
+        }
+        delete now;
+    }
+
+    void pop_front() {
+        if (empty()) return;
+        Node *now = first;
+        first = first->next;
+        if (first != nullptr) {
+            first->prev = nullptr;
+        } else {
+            first = nullptr;
+        }
+    }
+
+    Node *operator[](int pos) {
+        Node *now = first;
+        for (int i = 0; i < pos; i++) {
+            now = now->next;
+        }
+        return now;
+    }
+
+    void print() {
+        if (empty()) return;
+        Node *p = first;
+        while (p) {
+            cout << p->value << " ";
+            p = p->next;
+        }
+        cout << endl;
+    }
+};

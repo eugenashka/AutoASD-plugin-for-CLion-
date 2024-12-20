@@ -1,0 +1,17 @@
+Node *buildFromPreord(vector<int> &pre, int &ind, int min, int max) {
+    if (ind >= pre.size()) {
+        return nullptr;
+    }
+    if (pre[ind] < min || pre[ind] >= max) {
+        return nullptr;
+    }
+    Node *root = createNode(pre[ind]);
+    ind++;
+    if (ind < pre.size()) {
+        root->left_son = buildFromPreord(pre, ind, min, pre[ind - 1]);
+    }
+    if (ind < pre.size()) {
+        root->right_son = buildFromPreord(pre, ind, pre[ind - 1], max);
+    }
+    return root;
+}
