@@ -1,0 +1,32 @@
+vector<int> mark;
+vector<vector<pair<int, int>>> graph;
+
+int n, m;
+
+vector<int> dijkstra(int s) {
+    vector<int> d(n, 1e9 + 7);
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> q;
+    d[s] = 0;
+    q.push({0, s});
+
+    while (!q.empty()) {
+        pair<int, int> x = q.top();
+        int cur_d = x.first;
+        int v = x.second;
+        q.pop();
+
+        if (cur_d > d[v])
+            continue;
+
+        for (pair<int, int> y: graph[v]) {
+            int w = y.first;
+            int u = y.second;
+            if (d[u] > d[v] + w) {
+                d[u] = d[v] + w;
+                q.push({d[u], u});
+            }
+        }
+    }
+
+    return d;
+}

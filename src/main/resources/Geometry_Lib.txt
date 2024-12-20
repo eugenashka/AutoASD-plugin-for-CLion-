@@ -1,0 +1,446 @@
+const long double EPS = 0.000000001;
+const long double pi = atan(1) * 4;
+
+struct point {
+    long double x, y;
+
+    point() {
+        x = 0;
+        y = 0;
+    }
+
+    point(long double x_, long double y_) {
+        x = x_;
+        y = y_;
+    }
+
+    point(point a, point b) {
+        x = b.x - a.x;
+        y = b.y - a.y;
+    }
+
+    bool operator==(point other) const {
+        return x == other.x && y == other.y;
+    }
+
+    point operator+(point other) const {
+        point res;
+        res.x = x + other.x;
+        res.y = y + other.y;
+        return res;
+    }
+
+    point operator-(point other) const {
+        point res;
+        res.x = x - other.x;
+        res.y = y - other.y;
+        return res;
+    }
+
+    point operator*(long double d) const {
+        point res;
+        res.x = x * d;
+        res.y = y * d;
+        return res;
+    }
+
+    long double operator*(point other) const {
+        long double res = x * other.y - other.x * y;
+        return res;
+    }
+
+    long double operator^(point other) const {
+        long double res = x * other.x + y * other.y;
+        return res;
+    }
+
+    long double sqLen() {
+        return x * x + y * y;
+    }
+
+    long double len() {
+        return sqrt(sqLen());
+    }
+};
+
+istream &operator>>(istream &in, point &pnt) {
+    in >> pnt.x >> pnt.y;
+    return in;
+}
+
+ostream &operator<<(ostream &out, point &pnt) {
+    out << pnt.x << " " << pnt.y;
+    return out;
+}
+
+long double distPointToPoint(point a, point b) {
+    point ab = point(a, b);
+    return ab.len();
+}
+
+long double getAngle(point o, point a, point b) {
+    point oa = point(o, a);
+    point ob = point(o, b);
+
+    long double cos = (oa ^ ob) / (oa.len() * ob.len());
+
+    if (cos > 1)
+        cos = 1;
+    if (cos < -1)
+        cos = -1;
+
+    return acos(cos) * 180 / pi;
+}
+
+struct Line {
+    long double a, b, c;
+
+    Line() {
+        a = 0;
+        b = 0;
+        c = 0;
+    }
+
+    Line(long double a_, long double b_, long double c_) {
+        a = a_;
+        b = b_;
+        c = c_;
+    }
+
+    Line(point u, point v) {
+        a = v.y - u.y;
+        b = u.x - v.x;
+        c = -(u * v);
+    }
+
+    long double distToPoint(point pnt) {
+        long double x = pnt.x;
+        long double y = pnt.y;
+
+        long double res = 0;
+
+        if (a == 0 && b == 0)
+            res = c - x;
+        else
+            res = (a * x + b * y + c) / sqrt(a * a + b * b);
+        res = abs(res);
+
+        return res;
+    }
+
+    pair<int, point> crossWithLine(Line l) {
+        long double a2 = l.a;
+        long double b2 = l.b;
+        long double c2 = l.c;
+
+        int status = 0;
+        point res = point();
+
+        if (a * b2 == a2 * b) {
+            if (a * c2 == a2 * c && b * c2 == b2 * c)
+                status = 2;
+            else
+                status = 0;
+        } else {
+            status = 1;
+            long double x = (b * c2 - b2 * c) / (a * b2 - a2 * b);
+            long double y = (a2 * c - a * c2) / (a * b2 - a2 * b);
+            res = point(x, y);
+        }
+
+        return {status, res};
+    }
+};
+
+istream &operator>>(istream &in, Line &l) {
+    in >> l.a >> l.b >> l.c;
+    return in;
+}
+
+struct Cycle {
+    point o;
+    long double r;
+
+    Cycle() {
+        o = point();
+        r = 0;
+    }
+
+    Cycle(point o_, long double r_) {
+        o = o_;
+        r = r_;
+    }
+
+    Cycle(point p1, point p2, point p3) {
+        long double a = distPointToPoint(p1, p2);
+        long double b = distPointToPoint(p2, p3);
+        long double c = distPointToPoint(p3, p1);
+
+        long double p = (a + b + c) / 2;
+        r = a * b * c / (4 * sqrt(p * (p - a) * (p - b) * (p - c)));
+
+        Line l1, l2;
+
+        l1.a = p1.x - p2.x;
+        l1.b = p1.y - p2.y;
+        l1.c = -l1.a * (p1.x + p2.x) / 2 - l1.b * (p1.y + p2.y) / 2;
+
+        l2.a = p1.x - p3.x;
+        l2.b = p1.y - p3.y;
+        l2.c = -l2.a * (p1.x + p3.x) / 2 - l2.b * (p1.y + p3.y) / 2;
+
+        o = l1.crossWithLine(l2).second;
+    }
+
+    pair<int, vector<point>> crossWithLine(Line l) {
+        long double a = l.a;
+        long double b = l.b;
+        long double c = l.c;
+
+        int status = 0;
+        vector<point> res(2);
+
+        c = c + a * o.x + b * o.y;
+
+        long double norm = a * a + b * b;
+
+        long double x = -c * a / norm;
+        long double y = -c * b / norm;
+
+        if (c * c - r * r * norm > EPS)
+            status = 0;
+        else if (abs(c * c - r * r * norm) < EPS) {
+            status = 1;
+            res[0] = point(x, y) + o;
+        } else {
+            status = 2;
+            long double d = r * r - c * c / norm;
+            long double mult = sqrt(d / norm);
+
+            long double ax, ay, bx, by;
+            ax = x + b * mult;
+            ay = y - a * mult;
+            bx = x - b * mult;
+            by = y + a * mult;
+
+            res[0] = point(ax, ay) + o;
+            res[1] = point(bx, by) + o;
+        }
+
+        return {status, res};
+    }
+
+    pair<int, vector<point>> crossWithCycle(Cycle C) {
+        point o2 = C.o;
+        long double r2 = C.r;
+
+        int status = 0;
+        vector<point> res(2);
+
+        if (o == o2) {
+            if (r == r2)
+                status = 3;
+            else
+                status = 0;
+            return {status, res};
+        }
+
+        long double d = distPointToPoint(o, o2);
+
+        if (r + r2 < d || d < abs(r - r2)) {
+            status = 0;
+            return {status, res};
+        }
+
+        long double a = (r * r - r2 * r2 + d * d) / (2 * d);
+        long double b = d - a;
+        long double h = sqrt(r * r - a * a);
+
+        point p = o + (o2 - o) * (a / d);
+
+        res[0].x = p.x + (o2.y - o.y) / d * h;
+        res[0].y = p.y - (o2.x - o.x) / d * h;
+        res[1].x = p.x - (o2.y - o.y) / d * h;
+        res[1].y = p.y + (o2.x - o.x) / d * h;
+
+        if (res[0] == res[1])
+            status = 1;
+        else
+            status = 2;
+
+        return {status, res};
+    }
+
+    long double lenArea(point a, point b) {
+        long double angle = getAngle(o, a, b);
+        return angle * r;
+    }
+};
+
+s
+struct ang {
+    long double a, b;
+
+    bool operator==(ang other) const {
+        return a == other.a && b == other.b;
+    }
+};
+
+bool operator<(const ang &l, const ang &r) {
+    if (l.b == 0 && r.b == 0)
+        return l.a < r.a;
+    return l.a * r.b < l.b * r.a;
+}
+
+bool cmp(point a, point b) {
+    if (a.x == b.x)
+        return a.y < b.y;
+    return a.x < b.x;
+}
+
+struct Polygon {
+    vector<point> pts;
+    int sz;
+
+    vector<ang> angs;
+    point zero;
+
+    vector<point> hull;
+    int szHull;
+
+    Polygon(vector<point> pts_) {
+        pts = pts_;
+        sz = (int) pts.size();
+    }
+
+    long double S() {
+        long double res = 0;
+
+        for (int i = 0; i < sz; i++) {
+            point a, b;
+            if (i)
+                a = pts[i - 1];
+            else
+                a = pts.back();
+            b = pts[i];
+
+            res += (a.x - b.x) * (a.y + b.y);
+        }
+        res = abs(res);
+        res /= 2;
+
+        return res;
+    }
+
+    long double P() {
+        long double res = 0;
+
+        for (int i = 0; i < sz; i++) {
+            point a, b;
+            if (i)
+                a = pts[i - 1];
+            else
+                a = pts.back();
+            b = pts[i];
+
+            res += distPointToPoint(a, b);
+        }
+
+        return res;
+    }
+
+    long double getSigned(point a, point b, point c) {
+        point ab = point(a, b);
+        point ac = point(a, c);
+        return ab * ac;
+    }
+
+    void buildAng() {
+        zero = pts[0];
+        int id = 0;
+        for (int i = 0; i < sz; i++) {
+            if (zero.x > pts[i].x || (zero.x == pts[i].x && zero.y > pts[i].y)) {
+                zero = pts[i];
+                id = i;
+            }
+        }
+
+        vector<point> tmp = pts;
+        rotate(tmp.begin(), tmp.begin() + id, tmp.end());
+        angs.resize(sz - 1);
+
+        for (int i = 1; i < sz; i++) {
+            int j = i - 1;
+            angs[j].a = tmp[i].y - zero.y;
+            angs[j].b = tmp[i].x - zero.x;
+            if (angs[j].a == 0)
+                angs[j].b = (angs[j].b < 0 ? -1 : 1);
+        }
+
+    }
+
+    bool pointOnPolygon(point pnt) {
+        if (angs.size() == 0)
+            buildAng();
+
+        bool res = 0;
+
+        ang angP;
+        angP.a = pnt.y - zero.y;
+        angP.b = pnt.x - zero.x;
+        if (angP.a == 0)
+            angP.b = (angP.b < 0 ? -1 : 1);
+
+        if (zero == pnt)
+            res = 1;
+        else {
+            auto it = upper_bound(angs.begin(), angs.end(), angP);
+            if (it == angs.end() && angP == angs.back())
+                it = angs.end() - 1;
+            if (it != angs.begin() && it != angs.end()) {
+                int id = it - angs.begin();
+                point p1 = pts[id];
+                point p2 = pts[id + 1];
+                if (getSigned(pnt, p1, p2) >= 0)
+                    res = 1;
+            }
+        }
+
+        return res;
+    }
+
+    void buildHull() {
+        vector<point> tmp = pts;
+        sort(tmp.begin(), tmp.end(), cmp);
+
+        point start = tmp[0];
+        point finish = tmp.back();
+
+        vector<point> up, down;
+
+        up.push_back(start);
+        down.push_back(start);
+
+        for (int i = 1; i < sz; i++) {
+            if (i == sz - 1 || getSigned(start, finish, tmp[i]) > 0) {
+                while (up.size() > 1 && getSigned(tmp[i], up[up.size() - 2], up[up.size() - 1]) >= 0)
+                    up.pop_back();
+                up.push_back(tmp[i]);
+            }
+            if (i == sz - 1 || getSigned(start, finish, tmp[i]) < 0) {
+                while (down.size() > 1 && getSigned(tmp[i], down[down.size() - 1], down[down.size() - 2]) >= 0)
+                    down.pop_back();
+                down.push_back(tmp[i]);
+            }
+        }
+
+        for (int i = 0; i < up.size(); i++) {
+            hull.push_back(up[i]);
+        }
+        for (int i = down.size() - 2; i >= 1; i--) {
+            hull.push_back(down[i]);
+        }
+
+        szHull = (int) hull.size();
+    }
+};

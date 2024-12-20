@@ -1,0 +1,95 @@
+struct Node {
+    int value;
+    Node *next;
+};
+
+struct one_ordered_list {
+    Node *first;
+    Node *last;
+
+    one_ordered_list() : first(nullptr), last(nullptr) {}
+
+    bool empty() {
+        return first == nullptr;
+    }
+
+    void push_back(int _val) {
+        Node *p = new Node(_val);
+        if (empty()) {
+            first = p;
+            last = p;
+            return;
+        }
+        last->next = p;
+        last = p;
+    }
+
+    void print() {
+        if (empty()) return;
+        Node *p = first;
+        while (p) {
+            cout << p->value << " ";
+            p = p->next;
+        }
+        cout << endl;
+    }
+
+    Node *find(int _val) {
+        Node *p = first;
+        while (p && p->value != _val) p = p->next;
+        return (p && p->value == _val) ? p : nullptr;
+    }
+
+    void pop_front() {
+        if (empty()) return;
+        Node *p = first;
+        first = p->next;
+        delete p;
+    }
+
+    void pop_back() {
+        if (empty()) return;
+        if (first == last) {
+            pop_front();
+            return;
+        }
+        Node *p = first;
+        while (p->next != last) p = p->next;
+        p->next = nullptr;
+        delete last;
+        last = p;
+    }
+
+    void pop_key(int _val) {
+        if (empty()) return;
+        if (first->value == _val) {
+            pop_front();
+            return;
+        } else if (last->value == _val) {
+            pop_back();
+            return;
+        }
+        Node *slow = first;
+        Node *fast = first->next;
+        while (fast && fast->value != _val) {
+            fast = fast->next;
+            slow = slow->next;
+        }
+        if (!fast) {
+            cout << "This element does not exist" << endl;
+            return;
+        }
+        slow->next = fast->next;
+        delete fast;
+    }
+
+    Node *operator[](const int ind) {
+        if (empty()) return nullptr;
+        Node *p = first;
+        for (int i = 0; i < ind; i++) {
+            p = p->next;
+            if (!p) return nullptr;
+        }
+        return p;
+    }
+};

@@ -1,0 +1,30 @@
+vector<int> mark;
+vector<vector<int>> graph;
+
+int n, m;
+
+void dfs(int v) {
+    mark[v] = 1;
+    for (auto u: graph[v]) {
+        if (!mark[u]) {
+            dfs(u);
+        }
+    }
+}
+
+void bfs(int s) {
+    queue<int> q;
+    q.push(s);
+    mark[s] = 1;
+
+    while (!q.empty()) {
+        int v = q.front();
+        q.pop();
+        for (auto u: graph[v]) {
+            if (!mark[u]) {
+                mark[u] = 1;
+                q.push(u);
+            }
+        }
+    }
+}

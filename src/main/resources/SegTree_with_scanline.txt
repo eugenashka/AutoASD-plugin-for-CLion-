@@ -1,0 +1,64 @@
+struct Node {
+    int val, step;
+};
+
+vector<Node> tree;
+vector<int> push;
+vector<int> vec;
+
+struct Event {
+    int x, y1, y2, type;
+};
+
+bool cmp(Event a, Event b) {
+    return a.x < b.x;
+}
+
+Node merge(Node a, Node b) {
+    if (a.val == b.val)
+        return {a.val, a.step + b.step};
+    if (a.val < b.val)
+        return a;
+    else
+        return b;
+}
+
+void makePush(int v) {
+    if (push[v] == 0)
+        return;
+
+    push[2 * v + 1] += push[v];
+    push[2 * v + 2] += push[v];
+
+    tree[2 * v + 1].val += push[v];
+    tree[2 * v + 2].val += push[v];
+
+    push[v] = 0;
+}
+
+void build(int v, int l, int r) {
+    if (l == r - 1) {
+        tree[v] = {0, vec[l]};
+        return;
+    }
+    int mid = (l + r) / 2;
+    build(2 * v + 1, l, mid);
+    build(2 * v + 2, mid, r);
+    tree[v] = merge(tree[2 * v + 1], tree[2 * v + 2]);
+}
+
+void upd(int v, int l, int r, int ql, int qr, int x) {
+    if (qr <= l || ql >= r)
+        return;
+    if (ql <= l && qr >= r) {
+        tree[v].val += x;
+        push[v] += x;
+        return;
+    }
+
+    makePush(v);
+    int mid = (l + r) / 2;
+    upd(2 * v + 1, l, mid, ql, qr, x);
+    upd(2 * v + 2, mid, r, ql, qr, x);
+    tree[v] = merge(tree[2 * v + 1], tree[2 * v + 2]);
+}

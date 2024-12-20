@@ -1,0 +1,64 @@
+struct Node {
+    int maxima;
+    int add;
+};
+
+vector<Node> tree;
+vector<int> start_v;
+
+void apply(int v, int l, int r, int x) {
+    tree[v].maxima += x;
+    tree[v].add += x;
+}
+
+void push(int v, int l, int r) {
+    if (l + 1 == r) {
+        tree[v].add = 0;
+        return;
+    }
+    int mid = (l + r) / 2;
+    apply(2 * v + 1, l, mid, tree[v].add);
+    apply(2 * v + 2, mid, r, tree[v].add);
+    tree[v].add = 0;
+}
+
+Node merge(Node a, Node b) {
+    int maxima = max(a.maxima, b.maxima);
+    return {maxima, 0};
+}
+
+void build(int v, int l, int r) {
+    if (l + 1 == r) {
+        tree[v].maxima = start_v[l];
+        return;
+    }
+    int mid = (l + r) / 2;
+    build(2 * v + 1, l, mid);
+    build(2 * v + 2, mid, r);
+    tree[v] = merge(tree[2 * v + 1], tree[2 * v + 2]);
+}
+
+void upd(int v, int l, int r, int ql, int qr, int x) {
+    if (ql >= r || qr <= l)
+        return;
+    if (ql <= l && qr >= r) {
+        apply(v, l, r, x);
+        return;
+    }
+    push(v, l, r);
+    int mid = (l + r) / 2;
+    upd(2 * v + 1, l, mid, ql, qr, x);
+    upd(2 * v + 2, mid, r, ql, qr, x);
+    tree[v] = merge(tree[2 * v + 1], tree[2 * v + 2]);
+}
+
+Node get_ans(int v, int l, int r, int ql, int qr) {
+    if (ql >= r || qr <= l)
+        return {0, 0};
+    if (ql <= l && qr >= r)
+        return tree[v];
+    push(v, l, r);
+    int mid = (l + r) / 2;
+    return merge(get_ans(2 * v + 1, l, mid, ql, qr),
+                 get_ans(2 * v + 2, mid, r, ql, qr));
+}

@@ -1,0 +1,71 @@
+struct node {
+    int cnt;
+    int go[26];
+    int tree_cnt;
+
+    node() {
+        cnt = 0;
+        tree_cnt = 0;
+        for (int i = 0; i < 26; i++) {
+            go[i] = -1;
+        }
+    }
+};
+
+vector<node> trie;
+
+void add_str(string s) {
+    int v = 0;
+    for (int i = 0; i < (int) s.size(); i++) {
+        if (trie[v].go[s[i] - 'a'] == -1) {
+            trie.emplace_back();
+            trie[v].go[s[i] - 'a'] = (int) trie.size() - 1;
+        }
+        trie[v].tree_cnt++;
+        v = trie[v].go[s[i] - 'a'];
+    }
+    trie[v].tree_cnt++;
+    trie[v].cnt++;
+}
+
+// In this case find kth string
+void find_str(int k) {
+    int v = 0;
+    string ans;
+    int helper = 0;
+    while (1) {
+        if (helper == k - 1 && trie[v].cnt) {
+            cout << ans << "\\n";
+            return;
+        }
+        for (int i = 0; i < 26; i++) {
+            if (trie[v].go[i] != -1) {
+                helper += trie[trie[v].go[i]].tree_cnt;
+                if (helper == k) {
+                    v = trie[v].go[i];
+                    ans += 'a' + i;
+                    int flag = 1;
+                    while (flag) {
+                        flag = 0;
+                        for (int j = 25; j >= 0; j--) {
+                            if (trie[v].go[j] != -1) {
+                                flag = 1;
+                                ans += 'a' + j;
+                                v = trie[v].go[j];
+                                break;
+                            }
+                        }
+                    }
+                    cout << ans << "\\n";
+                    return;
+                }
+                if (helper > k) {
+                    helper -= trie[trie[v].go[i]].tree_cnt;
+                    v = trie[v].go[i];
+                    ans += 'a' + i;
+                    break;
+                }
+            }
+        }
+    }
+}
